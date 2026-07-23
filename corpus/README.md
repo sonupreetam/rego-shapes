@@ -14,13 +14,17 @@ See [SPEC.md](../SPEC.md) for the gate: ≥3 distinct shapes covering ≥10 poli
 | [aws-samples/aws-infra-policy-as-code-with-terraform](https://github.com/aws-samples/aws-infra-policy-as-code-with-terraform) | terraform-plan | 90 | 5 | ✅ complete |
 | [raspbernetes/k8s-security-policies](https://github.com/raspbernetes/k8s-security-policies) | k8s-manifest | 62 | 6 | ✅ complete |
 | [open-policy-agent/conftest — kubernetes examples](https://github.com/open-policy-agent/conftest/tree/master/examples/kubernetes) | k8s-manifest | 12 | 2 | ✅ complete |
-| [instrumenta/policies](https://github.com/instrumenta/policies) | k8s-manifest | ~30 | 1 | ✅ complete |
-| [redhat-cop/rego-policies](https://github.com/redhat-cop/rego-policies) | k8s-manifest | ~30 | 1 | ✅ complete |
+| [instrumenta/policies](https://github.com/instrumenta/policies) | k8s-manifest | 15 rules (2 files) | 1 | ✅ complete |
+| [redhat-cop/rego-policies](https://github.com/redhat-cop/rego-policies) | k8s-manifest | ~30 rules (60 files) | 1 | ✅ complete |
 
 ## Candidate Sources for Future Analysis
 
 Sources identified as having real, public Rego policies suitable for structural analysis.
 Not yet analyzed — listed here so contributors know where to look.
+
+**Archived or inactive repos are valid sources.** Structural patterns don't expire —
+a policy's Rego structure is the same whether the repo was last updated in 2020 or
+2025. What matters is the pattern, not the maintenance status.
 
 ### IaC Gates (Terraform / CloudFormation)
 
@@ -68,6 +72,12 @@ Not yet analyzed — listed here so contributors know where to look.
 | OPA partial evaluation docs | ~5 | Row-level filtering patterns |
 
 ## Corpus Refresh
+
+**Counting methodology:** The "Policies Analyzed" column above counts *rules
+classified* during structural analysis, not `.rego` files. Some repos pack many
+rules into one file (instrumenta: 15 rules in 2 files). The refresh script below
+counts *files* for change detection — a different metric, useful for spotting repo
+activity but not directly comparable to taxonomy policy counts.
 
 Run `scripts/corpus-refresh.sh` periodically to check if analyzed sources have
 added new policies since our last analysis:

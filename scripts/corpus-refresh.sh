@@ -4,6 +4,11 @@
 # Clones each analyzed source (shallow), counts .rego files (excluding tests),
 # and compares against the last-known count stored in corpus/counts.json.
 #
+# NOTE: This counts .rego FILES, not individual rules within files. Some repos
+# pack multiple rules into a single file (e.g., instrumenta/policies has 15
+# rules in 2 files). The counts here track repo-level change detection, not
+# exact policy counts from the taxonomy docs.
+#
 # Usage:
 #   ./scripts/corpus-refresh.sh          # check all sources
 #   ./scripts/corpus-refresh.sh --update  # update counts.json with current values
