@@ -24,12 +24,15 @@ Not yet analyzed — listed here so contributors know where to look.
 | [open-policy-agent/conftest — examples](https://github.com/open-policy-agent/conftest/tree/master/examples) | ~20 | Terraform, Dockerfile, K8s YAML, multi-format |
 | [fugue/regula](https://github.com/fugue/regula/tree/master/rego/rules) | ~40 | AWS/Azure/GCP rules for Terraform + CloudFormation |
 | [spacelift-io/spacelift-policies-example-library](https://github.com/spacelift-io/spacelift-policies-example-library) | ~15 | Terraform plan/apply gates |
+| [aws-samples/aws-infra-policy-as-code-with-terraform](https://github.com/aws-samples/aws-infra-policy-as-code-with-terraform) | ~30 | AWS-specific OPA rules for Terraform plans, per-service (S3, EFS, IAM, etc.) |
+| [cmcconnell1/policy-as-code](https://github.com/cmcconnell1/policy-as-code) | ~25 | Multi-cloud (AWS + Azure) security, tagging, cost governance framework |
 
 ### RBAC / ABAC (Authorization)
 
 | Source | Est. Policies | Notes |
 |--------|:---:|-------|
 | [OPA documentation tutorials](https://www.openpolicyagent.org/docs/latest/) | ~10 | HTTP API authz, RBAC, ABAC canonical examples |
+| [OPA Playground — access control examples](https://play.openpolicyagent.org/?example-group=access-control) | ~8 | Interactive RBAC/ABAC/PBAC examples with input fixtures |
 | [permitio/opal-example-policy-repo](https://github.com/permitio/opal-example-policy-repo) | ~5 | RBAC/ABAC with OPAL data updates |
 | [cerbos/cerbos — test policies](https://github.com/cerbos/cerbos/tree/main/internal/test/testdata) | ~15 | Not Rego but structurally comparable; use for pattern validation |
 
@@ -39,6 +42,19 @@ Not yet analyzed — listed here so contributors know where to look.
 |--------|:---:|-------|
 | [open-policy-agent/opa-envoy-plugin — examples](https://github.com/open-policy-agent/opa-envoy-plugin/tree/main/examples) | ~10 | Envoy ext_authz, JWT validation, path-based routing |
 | [OPA HTTP API authz tutorial](https://www.openpolicyagent.org/docs/latest/http-api-authorization/) | ~5 | Canonical API gateway patterns |
+
+### Kubernetes Config (Conftest — pre-deploy YAML validation)
+
+Distinct from k8s-admission: these policies validate static YAML manifests in CI,
+not admission requests at the API server. Different `input` shape (raw manifest vs
+admission review envelope).
+
+| Source | Est. Policies | Notes |
+|--------|:---:|-------|
+| [instrumenta/policies](https://github.com/instrumenta/policies) | ~15 | Shared Conftest policies for K8s deployments (limits, capabilities, read-only fs) |
+| [redhat-cop/rego-policies](https://github.com/redhat-cop/rego-policies) | ~30 | Red Hat CoP policies for Conftest + Gatekeeper dual-use |
+| [raspbernetes/k8s-security-policies](https://github.com/raspbernetes/k8s-security-policies) | ~20 | CIS Kubernetes Benchmark mapped to Rego; Conftest + Gatekeeper compatible |
+| [rallyhealth/conftest-policy-packs](https://github.com/rallyhealth/conftest-policy-packs) | ~20 | Enterprise Compliance-as-Code policies with markdown violation messages |
 
 ### CI/CD Pipeline
 
