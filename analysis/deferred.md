@@ -81,13 +81,12 @@ violation contains {"msg": msg} if {
 
 ### Recommendation
 
-1. Add a `lib/` directory to rego-shapes for shared Rego libraries
-2. Update the SPEC to allow shapes to import from `lib/` (self-contained at the
-   repo level, not the individual shape level)
-3. Create `lib/resource_units.rego` with the canonicalization helpers
-4. Then template the thin policy layer on top
+Use template partials (`_helpers/resource_units.tmpl`) to share the helper logic at
+generation time while keeping generated output self-contained. Tracked in
+[#1](https://github.com/sonupreetam/rego-shapes/issues/1).
 
-This is a SPEC change, so it should be a deliberate decision, not a drive-by fix.
+This shape is blocked on that proposal — once `_helpers/` is accepted, the thin
+policy template on top is straightforward to implement.
 
 ---
 
