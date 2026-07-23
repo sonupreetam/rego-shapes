@@ -31,16 +31,30 @@ shapes/<shape-name>/
 └── README.md            # When to use, pitfalls, related shapes
 ```
 
-## Shape Categories
+## Shape Catalog
 
-| Category | Description | Examples |
-|----------|-------------|----------|
-| **k8s-admission** | Kubernetes admission control (Gatekeeper/OPA webhook) | container-field-check, required-labels, image-allowlist |
-| **rbac** | Role-based access control | role-permission-map, hierarchical-roles |
-| **abac** | Attribute-based access control | owner-access, org-scoped, classification-gate |
-| **iac-gate** | Infrastructure-as-Code validation (Terraform, CloudFormation) | resource-field-check, iam-wildcard-deny |
-| **api-authz** | HTTP/API request authorization | endpoint-allowlist, scope-check |
-| **data-filter** | Data-level filtering and masking | field-redaction, row-filter |
+Shapes are derived from structural analysis of public policy corpora — not invented
+speculatively. See [analysis/taxonomy.md](analysis/taxonomy.md) for the full
+classification and methodology.
+
+### Kubernetes Admission (`shapes/k8s-admission/`)
+
+Derived from 49 policies in [gatekeeper-library](https://github.com/open-policy-agent/gatekeeper-library).
+20 structural shapes identified; top 6 cover 43% of all policies.
+
+| Shape | Corpus Coverage | Status |
+|-------|:-:|:-:|
+| `container-field-check` | 5 policies | ✅ shipped |
+| `container-field-in-allowlist` | 7 policies | planned |
+| `container-resource-limit-check` | 5 policies | planned |
+| `container-image-allowlist` | 2 policies | ✅ shipped |
+| `container-image-denylist` | 2 policies | planned |
+| `metadata-must-have` | 2 policies | ✅ shipped |
+| `resource-field-equality-block` | 2 policies | ✅ shipped |
+| `resource-numeric-range-check` | 2 policies | planned |
+
+Future categories (RBAC, ABAC, IaC, API authz) require their own corpus analysis
+before shapes can be added. See [SPEC.md](SPEC.md) for scope boundaries.
 
 ## Usage
 
@@ -70,12 +84,13 @@ requirements that don't fit a shape, and validate AI output with OPA's toolchain
 
 ## Corpus Analysis
 
-The `analysis/` directory contains the structural analysis of existing Rego policy
-libraries that informed the shape taxonomy:
+The `analysis/` directory contains the structural analysis that informed the shape
+taxonomy:
 
-- Source policies from [gatekeeper-library](https://github.com/open-policy-agent/gatekeeper-library), [OPA contrib](https://github.com/open-policy-agent/contrib), and other public collections
-- Structural classification by Rego shape (not by domain or compliance framework)
-- Coverage metrics: what percentage of real-world policies each shape covers
+- **49 policies** from [gatekeeper-library](https://github.com/open-policy-agent/gatekeeper-library)
+  (30 general + 19 pod-security-policy) classified by structural shape
+- **20 shapes** identified, with coverage metrics per shape
+- Full per-policy classification in [analysis/taxonomy.md](analysis/taxonomy.md)
 
 See [analysis/README.md](analysis/README.md) for methodology.
 
