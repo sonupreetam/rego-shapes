@@ -268,3 +268,129 @@ Priority for implementation:
 
 1. **`component-flag-check`** — 36 policies, clean template surface, entirely new
 2. **`pod-field-check`** — 7 policies, simple template, fills a gap
+
+---
+
+## Appendix: Per-Policy Classification (raspbernetes)
+
+Full structural classification of all 62 raspbernetes policies.
+
+### CIS.1.2.x — API Server (19 policies → component-flag-check)
+
+| Policy | Condition | Sub-variant |
+|--------|-----------|-------------|
+| CIS.1.2.1 | `not flag_contains_string(cmd, "--anonymous-auth", "false")` | flag-value-required |
+| CIS.1.2.2 | `contains_element(cmd, "--token-auth-file")` | flag-must-not-exist |
+| CIS.1.2.3 | `contains_element(cmd, "--DenyServiceExternalIPs")` | flag-must-not-exist |
+| CIS.1.2.4 | `flag_contains_string(cmd, "--kubelet-https", "false")` | flag-value-denied |
+| CIS.1.2.5 | `not contains_element(cmd, "--kubelet-client-certificate")` | flag-must-exist (×2) |
+| CIS.1.2.6 | `not contains_element(cmd, "--kubelet-certificate-authority")` | flag-must-exist |
+| CIS.1.2.7 | `flag_contains_string(cmd, "--authorization-mode", "AlwaysAllow")` | flag-value-denied |
+| CIS.1.2.8 | `not flag_contains_string(cmd, "--authorization-mode", "Node")` | flag-value-required |
+| CIS.1.2.9 | `not flag_contains_string(cmd, "--authorization-mode", "RBAC")` | flag-value-required |
+| CIS.1.2.10 | `not flag_contains_string(cmd, "--enable-admission-plugins", "EventRateLimit")` | flag-value-required |
+| CIS.1.2.11 | `flag_contains_string(cmd, "--enable-admission-plugins", "AlwaysAdmit")` | flag-value-denied |
+| CIS.1.2.12 | `not flag_contains_string(cmd, "--enable-admission-plugins", "AlwaysPullImages")` | flag-value-required |
+| CIS.1.2.13 | `not flag_contains_string(cmd, "--enable-admission-plugins", "SecurityContextDeny")` | flag-value-required |
+| CIS.1.2.14 | `flag_contains_string(cmd, "--enable-admission-plugins", "NamespaceLifecycle")` | flag-value-denied |
+| CIS.1.2.15 | `flag_contains_string(cmd, "--enable-admission-plugins", "NodeRestriction")` | flag-value-denied |
+| CIS.1.2.16 | `not flag_contains_string(cmd, "--secure-port", "6443")` | flag-value-required |
+| CIS.1.2.17 | `not flag_contains_string(cmd, "--profiling", "false")` | flag-value-required |
+| CIS.1.2.18 | `contains_element(cmd, "--insecure-bind-address")` | flag-must-not-exist |
+| CIS.1.2.19 | `not flag_contains_string(cmd, "--audit-log-path", ...)` | flag-value-required |
+
+### CIS.1.3.x — Controller Manager (7 policies → component-flag-check)
+
+| Policy | Flag | Sub-variant |
+|--------|------|-------------|
+| CIS.1.3.1 | `--terminated-pod-gc-threshold` | flag-value-required |
+| CIS.1.3.2 | `--profiling=false` | flag-value-required |
+| CIS.1.3.3 | `--use-service-account-credentials=true` | flag-value-required |
+| CIS.1.3.4 | `--service-account-private-key-file` | flag-must-exist |
+| CIS.1.3.5 | `--root-ca-file` | flag-must-exist |
+| CIS.1.3.6 | `--feature-gates=RotateKubeletServerCertificate=true` | flag-value-required |
+| CIS.1.3.7 | `--bind-address=127.0.0.1` | flag-value-required |
+
+### CIS.1.4.x — Scheduler (2 policies → component-flag-check)
+
+| Policy | Flag | Sub-variant |
+|--------|------|-------------|
+| CIS.1.4.1 | `--profiling=false` | flag-value-required |
+| CIS.1.4.2 | `--bind-address=127.0.0.1` | flag-value-required |
+
+### CIS.2.x — etcd (7 policies → component-flag-check)
+
+| Policy | Flag | Sub-variant |
+|--------|------|-------------|
+| CIS.2.1 | `--cert-file` + `--key-file` | flag-value-required (×2 rules) |
+| CIS.2.2 | `--client-cert-auth=true` | flag-value-required |
+| CIS.2.3 | `--auto-tls=true` (deny) | flag-value-required |
+| CIS.2.4 | `--peer-cert-file` + `--peer-key-file` | flag-value-required (×2 rules) |
+| CIS.2.5 | `--peer-client-cert-auth=true` | flag-value-required |
+| CIS.2.6 | `--peer-auto-tls=true` (deny) | flag-value-required |
+| CIS.2.7 | `--trusted-ca-file` cross-value check | *(minor shape: cross-value)* |
+
+### CIS.5.1.x — RBAC / Service Accounts (5 policies)
+
+| Policy | Shape | Iteration | Condition |
+|--------|-------|-----------|-----------|
+| CIS.5.1.1 | rbac-rule-check | clusterrolebindings + rolebindings | `roleRef.name == "cluster-admin"` |
+| CIS.5.1.2 | rbac-rule-check | clusterroles + roles | set intersection on rules |
+| CIS.5.1.3 | rbac-rule-check | clusterroles + roles | `rules[_].*.* == "*"` |
+| CIS.5.1.5 | resource-multi-field-check | pods + serviceaccounts | `serviceAccountName == "default"` |
+| CIS.5.1.6 | resource-multi-field-check | pods + serviceaccounts | automountServiceAccountToken |
+
+### CIS.5.2.x — Pod Security (5 policies)
+
+| Policy | Shape | Field Checked |
+|--------|-------|---------------|
+| CIS.5.2.1 | container-field-check | `securityContext.privileged` |
+| CIS.5.2.2 | pod-field-check | `spec.hostPID` |
+| CIS.5.2.3 | pod-field-check | `spec.hostIPC` |
+| CIS.5.2.4 | pod-field-check | `spec.hostNetwork` |
+| CIS.5.2.5 | container-field-check | `securityContext.allowPrivilegeEscalation` |
+
+### CIS.5.4.1, CIS.5.5.1
+
+| Policy | Shape | Detail |
+|--------|-------|--------|
+| CIS.5.4.1 | container-field-check | `env[_].valueFrom.secretKeyRef` presence |
+| CIS.5.5.1 | component-flag-check | apiserver `--enable-admission-plugins` |
+
+### K.SEC.01–15 — Custom Security (15 policies)
+
+| Policy | Shape | Field / Condition |
+|--------|-------|-------------------|
+| K.SEC.01 | container-field-check | `not resources.limits.cpu` |
+| K.SEC.02 | container-field-check | `not resources.limits.memory` |
+| K.SEC.03 | container-field-check | `capabilities.add[_] == cap` (set membership) |
+| K.SEC.04 | container-field-check | `not dropped_capability(cap)` (negated set) |
+| K.SEC.05 | container-field-check | `securityContext.privileged` |
+| K.SEC.06 | container-field-check | `not readOnlyRootFilesystem` |
+| K.SEC.07 | container-field-check | `not runAsNonRoot` |
+| K.SEC.08 | *(minor: numeric-check)* | `runAsUser < 10000` |
+| K.SEC.09 | pod-field-check | `spec.hostAliases` |
+| K.SEC.10 | *(minor: image-tag-check)* | image tag == "latest" |
+| K.SEC.11 | pod-field-check | `spec.hostNetwork` |
+| K.SEC.12 | pod-field-check | `spec.hostIPC` |
+| K.SEC.13 | *(minor: volume-field-check)* | `hostPath.path == "/var/run/docker.sock"` |
+| K.SEC.14 | pod-field-check | `spec.hostPID` |
+| K.SEC.15 | container-field-check | `securityContext.allowPrivilegeEscalation` |
+
+### Shared Library (`lib/kubernetes.rego`)
+
+All 62 policies import from `data.lib.kubernetes`. Key helpers:
+
+| Helper | Used By |
+|--------|---------|
+| `kubernetes.containers[c]` | 10 policies (container-field-check) |
+| `kubernetes.pods[pod]` | 7 policies (pod-field-check) |
+| `kubernetes.apiserver[c]` | 19 policies (CIS.1.2.x) |
+| `kubernetes.controller[c]` | 7 policies (CIS.1.3.x) |
+| `kubernetes.scheduler[c]` | 2 policies (CIS.1.4.x) |
+| `kubernetes.etcd[c]` | 7 policies (CIS.2.x) |
+| `kubernetes.clusterroles[cr]` | 2 policies (CIS.5.1.x) |
+| `kubernetes.rolebindings[rb]` | 1 policy (CIS.5.1.1) |
+| `flag_contains_string(arr, key, val)` | 36 policies |
+| `contains_element(arr, elem)` | 6 policies |
+| `kubernetes.format(msg)` | All 62 policies |

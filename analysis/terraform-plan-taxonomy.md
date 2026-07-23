@@ -226,3 +226,79 @@ unique correlation logic. Better suited for AI-with-guardrails or hand-authoring
 1. **`tf-resource-field-check`** — 45 policies, clean template surface
 2. **`tf-field-in-set`** — 12 policies, straightforward parameterization
 3. **`tf-inline-flat-deny`** — 10 policies (or merge with #1 as compact variant)
+
+---
+
+## Appendix: Per-Policy Classification
+
+Full structural classification of the 21 sampled policies. Remaining ~69 policies
+were classified by structure scan against these established shape patterns.
+
+### Sample — Shape 1: tf-resource-field-check (~45 policies)
+
+| Policy | Resource Type | Field Checked | Condition | Helpers |
+|--------|---------------|---------------|-----------|:-------:|
+| `acm-m-1` | `aws_acm_certificate` | `validation_method` | equality | 2 |
+| `acm-m-2` | `aws_acm_certificate` | `certificate_transparency_logging_preference` | equality | 2 |
+| `redshift-m-1` | `aws_redshift_cluster` | `encrypted` | boolean | 2 |
+| `eks-r-1` | `aws_eks_cluster` | `endpoint_private_access` | boolean | 2 |
+| `eks-r-2` | `aws_eks_cluster` | `endpoint_public_access` | negation | 2 |
+| `elb-m-1` | `aws_lb` | `access_logs[_].enabled` | boolean | 2 |
+| `elb-m-2` | `aws_lb` | `internal` | boolean | 2 |
+| `mwaa-m-1` | `aws_mwaa_environment` | `webserver_access_mode` | equality | 2 |
+| `opensearch-r-1` | `aws_opensearch_domain` | `node_to_node_encryption` | boolean | 2 |
+| `msk-m-1` | `aws_msk_cluster` | `encryption_in_transit` | nested field | 2 |
+| `elasticache-m-1` | `aws_elasticache_replication_group` | `at_rest_encryption_enabled` | boolean | 2 |
+| `dynamodb-m-1` | `aws_dynamodb_table` | `point_in_time_recovery` | boolean | 2 |
+
+### Sample — Shape 2: tf-config-reference-check (~18 policies)
+
+| Policy | Resource Type | Field | Resolution Method |
+|--------|---------------|-------|-------------------|
+| `efs-m-1` | `aws_efs_file_system` | `kms_key_id` | `change.after` + `find_configuration_resource` |
+| `systemsmanager-m-1` | `aws_ssm_parameter` | `key_id` | ARN prefix + config references |
+| `route53-r-1` | `aws_route53_zone` | VPC association | config references |
+| `lambda-r-1` | `aws_lambda_function` | VPC config | config references |
+
+### Sample — Shape 3: tf-field-in-set (~12 policies)
+
+| Policy | Resource Type | Field | Set Type |
+|--------|---------------|-------|----------|
+| `apigateway-m-1` | `aws_api_gateway_rest_api` | `endpoint_configuration.types` | constant set |
+| `eks-m-1` | `aws_eks_cluster` | `enabled_cluster_log_types` | required set (all-must-match) |
+
+### Sample — Shape 4: tf-inline-flat-deny (~10 policies)
+
+| Policy | Resource Type | Condition | Lines |
+|--------|---------------|-----------|:-----:|
+| `ec2linux-m-1` | `aws_instance` | `monitoring == true` | 8 |
+| `pl-m-1` | `aws_vpc_endpoint_service` | `acceptance_required == true` | 8 |
+
+### Sample — Shape 5: tf-cross-resource-check (~10 policies)
+
+| Policy | Resource Type | Correlation Method | Complexity |
+|--------|---------------|--------------------|:----------:|
+| `ec2linux-r-1` | `aws_instance` + `aws_security_group` | Cross-resource join | 6 helpers |
+| `opensearch-m-1` | `aws_opensearch_domain` | VPC + encryption correlation | 4 helpers |
+| `lambda-m-1` | `aws_lambda_permission` | `json.unmarshal` IAM policy | 5 helpers |
+| `cloudwatch-m-1` | `aws_cloudwatch_log_group` | Multi-resource walk | 8 helpers |
+
+### Coverage by AWS Service
+
+| Service | Policies | Primary Shape |
+|---------|:--------:|---------------|
+| API Gateway | 5 | Shape 1, 3 |
+| ECR | 6 | Shape 1 |
+| EKS | 5 | Shape 1, 2, 3 |
+| Redshift | 7 | Shape 1 |
+| OpenSearch | 6 | Shape 1, 2, 5 |
+| ELB | 4 | Shape 1 |
+| EMR | 5 | Shape 1, 2 |
+| DMS | 5 | Shape 1 |
+| ElastiCache | 5 | Shape 1 |
+| EFS | 3 | Shape 1, 2 |
+| MSK | 4 | Shape 1 |
+| MWAA | 5 | Shape 1 |
+| Transfer Family | 4 | Shape 1 |
+| DynamoDB | 3 | Shape 1 |
+| Other (14 services) | 18 | Mixed |
