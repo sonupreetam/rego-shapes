@@ -1,0 +1,30 @@
+package {{.Package}}
+
+import rego.v1
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.containers
+	{{.Condition}}
+	msg := sprintf(
+		"Container '%s': {{.ViolationMessage}}",
+		[container.name],
+	)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.initContainers
+	{{.Condition}}
+	msg := sprintf(
+		"Init container '%s': {{.ViolationMessage}}",
+		[container.name],
+	)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.ephemeralContainers
+	{{.Condition}}
+	msg := sprintf(
+		"Ephemeral container '%s': {{.ViolationMessage}}",
+		[container.name],
+	)
+}

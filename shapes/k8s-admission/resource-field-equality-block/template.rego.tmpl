@@ -1,0 +1,12 @@
+package {{.Package}}
+
+import rego.v1
+
+violation contains {"msg": msg} if {
+	input.review.kind.kind == "{{.Kind}}"
+	input.review.object.{{.FieldPath}} == "{{.BlockedValue}}"
+	msg := sprintf(
+		"%s '%s': {{.ViolationMessage}}",
+		["{{.Kind}}", input.review.object.metadata.name],
+	)
+}

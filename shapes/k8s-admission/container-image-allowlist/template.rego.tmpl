@@ -1,0 +1,37 @@
+package {{.Package}}
+
+import rego.v1
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.containers
+	not image_allowed(container.image)
+	msg := sprintf(
+		"Container '%s' uses image '%s' from unapproved registry",
+		[container.name, container.image],
+	)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.initContainers
+	not image_allowed(container.image)
+	msg := sprintf(
+		"Init container '%s' uses image '%s' from unapproved registry",
+		[container.name, container.image],
+	)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.ephemeralContainers
+	not image_allowed(container.image)
+	msg := sprintf(
+		"Ephemeral container '%s' uses image '%s' from unapproved registry",
+		[container.name, container.image],
+	)
+}
+
+image_allowed(image) if {
+	some prefix in allowed_repos
+	startswith(image, prefix)
+}
+
+allowed_repos := { {{- range $i, $repo := .AllowedRepos}}{{if $i}}, {{end}}"{{$repo}}"{{end -}} }

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "container-field-check parameters",
+  "description": "Parameters for generating a Rego policy that checks a field on every container in a pod spec.",
+  "type": "object",
+  "required": ["Package", "Condition", "ViolationMessage"],
+  "properties": {
+    "Package": {
+      "type": "string",
+      "description": "Rego package name (e.g., k8s.deny_privilege_escalation)",
+      "pattern": "^[a-z][a-z0-9_.]*$"
+    },
+    "Condition": {
+      "type": "string",
+      "description": "Rego condition expression referencing 'container' (e.g., container.securityContext.privileged == true)",
+      "examples": [
+        "container.securityContext.privileged == true",
+        "not container.securityContext.runAsNonRoot == true",
+        "not container.resources.limits.memory"
+      ]
+    },
+    "ViolationMessage": {
+      "type": "string",
+      "description": "Human-readable violation message (container name is prepended automatically)",
+      "examples": [
+        "privileged containers are not allowed",
+        "must set runAsNonRoot to true",
+        "must define resources.limits.memory"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

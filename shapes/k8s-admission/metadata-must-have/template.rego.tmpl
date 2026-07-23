@@ -1,0 +1,24 @@
+package {{.Package}}
+
+import rego.v1
+
+violation contains {"msg": msg, "details": {"missing_{{.MetadataType}}": missing}} if {
+	provided := {key | some key, _ in input.review.object.metadata.{{.MetadataType}}}
+	required := { {{- range $i, $key := .RequiredKeys}}{{if $i}}, {{end}}"{{$key}}"{{end -}} }
+	missing := required - provided
+	count(missing) > 0
+	msg := sprintf(
+		"Resource '%s' is missing required {{.MetadataType}}: %v",
+		[input.review.object.metadata.name, missing],
+	)
+}
+{{range .RegexChecks}}
+violation contains {"msg": msg} if {
+	value := input.review.object.metadata.{{$.MetadataType}}["{{.Key}}"]
+	not regex.match("{{.AllowedRegex}}", value)
+	msg := sprintf(
+		"Resource '%s': {{$.MetadataType}} '{{.Key}}' value '%s' does not match required pattern '{{.AllowedRegex}}'",
+		[input.review.object.metadata.name, value],
+	)
+}
+{{end}}

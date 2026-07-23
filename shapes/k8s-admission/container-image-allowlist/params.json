@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "container-image-allowlist parameters",
+  "description": "Parameters for generating a Rego policy that restricts container images to approved registries.",
+  "type": "object",
+  "required": ["Package", "AllowedRepos"],
+  "properties": {
+    "Package": {
+      "type": "string",
+      "description": "Rego package name",
+      "pattern": "^[a-z][a-z0-9_.]*$"
+    },
+    "AllowedRepos": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "List of allowed image registry prefixes",
+      "examples": [["registry.redhat.io/", "quay.io/redhat/"]]
+    }
+  },
+  "additionalProperties": false
+}

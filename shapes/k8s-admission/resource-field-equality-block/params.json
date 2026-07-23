@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "resource-field-equality-block parameters",
+  "description": "Parameters for generating a Rego policy that blocks a resource when a field equals a specific value.",
+  "type": "object",
+  "required": ["Package", "Kind", "FieldPath", "BlockedValue", "ViolationMessage"],
+  "properties": {
+    "Package": {
+      "type": "string",
+      "description": "Rego package name",
+      "pattern": "^[a-z][a-z0-9_.]*$"
+    },
+    "Kind": {
+      "type": "string",
+      "description": "Kubernetes resource kind to match (e.g., Service, Ingress)"
+    },
+    "FieldPath": {
+      "type": "string",
+      "description": "Dot-separated path to the field on the resource (e.g., spec.type)",
+      "examples": ["spec.type", "spec.hostNetwork"]
+    },
+    "BlockedValue": {
+      "type": "string",
+      "description": "The value to deny (e.g., NodePort, LoadBalancer)"
+    },
+    "ViolationMessage": {
+      "type": "string",
+      "description": "Human-readable violation message",
+      "examples": [
+        "NodePort services are not allowed",
+        "LoadBalancer services are not allowed"
+      ]
+    }
+  },
+  "additionalProperties": false
+}
