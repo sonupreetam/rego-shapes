@@ -1,0 +1,70 @@
+package {{.Package}}
+
+import rego.v1
+
+import data.lib.resource_units
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.containers
+	_check_resource(container)
+	msg := _violation_msg(container)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.initContainers
+	_check_resource(container)
+	msg := _violation_msg(container)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.ephemeralContainers
+	_check_resource(container)
+	msg := _violation_msg(container)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.containers
+	not container.resources.{{.Section}}
+	msg := sprintf("container <%v> has no resource {{.Section}}", [container.name])
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.initContainers
+	not container.resources.{{.Section}}
+	msg := sprintf("container <%v> has no resource {{.Section}}", [container.name])
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.ephemeralContainers
+	not container.resources.{{.Section}}
+	msg := sprintf("container <%v> has no resource {{.Section}}", [container.name])
+}
+{{if eq .ResourceType "cpu"}}
+_check_resource(container) if {
+	cpu_orig := container.resources.{{.Section}}.cpu
+	cpu := resource_units.canonify_cpu(cpu_orig)
+	max_cpu := resource_units.canonify_cpu(input.parameters.cpu)
+	cpu > max_cpu
+}
+
+_violation_msg(container) := msg if {
+	msg := sprintf(
+		"container <%v> cpu {{.Section}} <%v> exceeds maximum <%v>",
+		[container.name, container.resources.{{.Section}}.cpu, input.parameters.cpu],
+	)
+}
+{{else if eq .ResourceType "memory"}}
+_check_resource(container) if {
+	mem_orig := container.resources.{{.Section}}.memory
+	mem := resource_units.canonify_mem(mem_orig)
+	max_mem := resource_units.canonify_mem(input.parameters.memory)
+	mem > max_mem
+}
+
+_violation_msg(container) := msg if {
+	msg := sprintf(
+		"container <%v> memory {{.Section}} <%v> exceeds maximum <%v>",
+		[container.name, container.resources.{{.Section}}.memory, input.parameters.memory],
+	)
+}
+{{end}}

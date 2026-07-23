@@ -44,10 +44,10 @@ Provide a catalog of parameterized Rego policy shapes — structural templates w
    that want AI fallback build that themselves.
 5. **Runtime policy evaluation** — shapes are for generation-time, not evaluation-time.
 6. **Policy-as-a-service** — no API, no server, no deployment infrastructure.
-7. **Non-Kubernetes domains** (initially) — RBAC, ABAC, API authz, IaC gates are
-   future categories. The initial focus is Kubernetes admission control. New categories
-   require corpus analysis first: ≥3 distinct shapes covering ≥10 policies from public
-   sources. See [corpus/README.md](corpus/README.md) for candidate sources.
+7. **Unanalyzed domains** — RBAC, ABAC, API authz, CI/CD are future categories.
+   Current focus is Kubernetes admission control and Terraform plan validation. New
+   categories require corpus analysis first: ≥3 distinct shapes covering ≥10 policies
+   from public sources. See [corpus/README.md](corpus/README.md) for candidate sources.
 8. **Compliance framework mapping** — shapes are structural, not tied to CIS/NIST/SOC2.
    Compliance mapping is the consumer's responsibility.
 
@@ -68,8 +68,10 @@ Every shape MUST satisfy:
 1. **Deterministic** — same shape + same params = byte-identical output
 2. **Valid Rego v1** — output passes `opa check` with `import rego.v1`
 3. **Tested** — all example tests pass via `opa test`
-4. **Self-contained** — no external library dependencies (no `data.lib.*` imports).
-   Shapes that need helpers must include them in the template.
+4. **Self-contained or lib-dependent** — shapes either include all helpers in the
+   template (self-contained) or import from the repo's `lib/` directory
+   (`data.lib.*`). External dependencies outside this repo are not allowed.
+   Shapes that use `lib/` must document the required library files in their README.
 5. **Parameterized** — at least one parameter must vary between examples. A shape with
    zero parameters is a fixed policy, not a shape.
 
@@ -93,6 +95,33 @@ Every shape MUST satisfy:
 5. Templates SHOULD use `violation contains {"msg": msg} if` (Rego v1 set rule syntax)
 6. Templates MUST iterate over all three container lists where applicable (containers,
    initContainers, ephemeralContainers)
+
+## Shared Libraries (`lib/`)
+
+The `lib/` directory contains shared Rego libraries that shapes may import. Libraries
+exist for helper logic that is:
+
+1. **Substantial** — too large to inline in every template (30+ lines)
+2. **Reused** — shared across ≥2 shapes or ≥3 corpus policies
+3. **Stable** — logic that is well-understood and unlikely to change frequently
+
+### Library Contract
+
+Every library MUST:
+
+| Requirement | Description |
+|-------------|-------------|
+| Package under `lib.*` | e.g., `package lib.resource_units` |
+| Rego v1 syntax | `import rego.v1` |
+| Own test file | `lib/<name>_test.rego` with ≥5 tests |
+| No external imports | Libraries must not import from shapes or other `data.*` paths outside `lib/` |
+| Documentation | Header comment explaining purpose and usage |
+
+### Consumer Deployment
+
+Consumers that use shapes with `lib/` dependencies must deploy the library files
+alongside their generated policies. OPA resolves `data.lib.*` imports at evaluation
+time — if the library is missing, rules evaluate to `undefined` (no error).
 
 ## Quality Gates
 

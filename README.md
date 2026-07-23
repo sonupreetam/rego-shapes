@@ -48,7 +48,7 @@ plus 134 policies from [raspbernetes](https://github.com/raspbernetes/k8s-securi
 |-------|:-:|:-:|
 | `container-field-check` | 15 policies | ✅ shipped |
 | `container-field-in-allowlist` | 7 policies | ✅ shipped |
-| `container-resource-limit-check` | 5 policies | [deferred](analysis/deferred.md) |
+| `container-resource-limit-check` | 5 policies | ✅ shipped |
 | `container-image-allowlist` | 2 policies | ✅ shipped |
 | `container-image-denylist` | 2 policies | ✅ shipped |
 | `metadata-must-have` | 2 policies | ✅ shipped |
@@ -115,6 +115,19 @@ taxonomy:
   templated under the current contract
 
 See [analysis/README.md](analysis/README.md) for methodology.
+
+## Shared Libraries (`lib/`)
+
+Some shapes require substantial helper logic (unit conversion, input normalization) that
+would be wasteful to duplicate in every generated policy. These are provided as shared
+Rego libraries in `lib/`:
+
+| Library | Purpose | Used by |
+|---------|---------|---------|
+| `lib/resource_units.rego` | CPU/memory/storage quantity canonicalization | `container-resource-limit-check` |
+
+Consumers that use shapes with library dependencies must deploy `lib/` alongside their
+generated policies. See [SPEC.md](SPEC.md#shared-libraries-lib) for the library contract.
 
 ## Corpus Sources
 

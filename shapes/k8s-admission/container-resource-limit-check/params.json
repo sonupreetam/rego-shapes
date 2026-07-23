@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "container-resource-limit-check",
+  "title": "Container Resource Limit Check",
+  "description": "Check that container resource requests or limits do not exceed a maximum value. Requires lib/resource_units.rego at runtime.",
+  "type": "object",
+  "required": ["Package", "ResourceType", "Section"],
+  "properties": {
+    "Package": {
+      "type": "string",
+      "description": "Rego package name for the generated policy",
+      "examples": ["k8s.cpu_limit", "k8s.memory_limit"]
+    },
+    "ResourceType": {
+      "type": "string",
+      "enum": ["cpu", "memory"],
+      "description": "Which resource type to check"
+    },
+    "Section": {
+      "type": "string",
+      "enum": ["limits", "requests"],
+      "description": "Whether to check resource limits or requests"
+    }
+  },
+  "additionalProperties": false
+}

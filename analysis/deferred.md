@@ -6,87 +6,16 @@ documents why it was deferred and what approach would be needed.
 
 ---
 
-## container-resource-limit-check
+## ~~container-resource-limit-check~~ (resolved)
 
-**Corpus coverage:** 5 policies (10% of gatekeeper-library)
+**Status:** ✅ Shipped — resolved via `lib/resource_units.rego` (Option 2: repo-level
+shared library). SPEC contract #4 amended to allow `data.lib.*` imports from
+repo-provided libraries.
 
-**Policies:** `containerlimits`, `containerrequests`, `containerresourceratios`,
-`containerresources`, `ephemeralstoragelimit`
+See `shapes/k8s-admission/container-resource-limit-check/` and `lib/resource_units.rego`.
 
-### Why it's deferred
-
-These 5 policies share nearly identical boilerplate for CPU/memory/storage unit
-canonicalization:
-
-- `canonify_cpu/1` — converts CPU strings (`"100m"`, `"0.5"`, `"2"`) to millicores
-- `canonify_mem/1` — converts memory strings (`"128Mi"`, `"1Gi"`, `"512000"`) to bytes
-- `mem_multiple/1` — maps suffixes (`Ki`, `Mi`, `Gi`, `Ti`) to numeric multipliers
-- `get_suffix/1` — extracts the unit suffix from a resource string
-- `missing/2` — checks if a resource field is absent
-- `general_violation` — intermediate rule that delegates to the main `violation` rule
-
-A template for this shape would be **80+ lines of unit-conversion helpers** with a
-~10-line policy at the top. This violates the shape contract in two ways:
-
-1. **Self-contained becomes wasteful.** Every policy generated from this shape would
-   duplicate the same 70 lines of conversion logic. If a bug is found in
-   `canonify_mem`, every generated policy needs regeneration.
-
-2. **The template is mostly library, not shape.** The parameterizable surface is small
-   (which resource type, which field, what threshold), but the fixed boilerplate
-   dominates the output.
-
-### What it needs instead
-
-**Library extraction.** The unit-conversion helpers should be a shared Rego library
-(`lib/resource_units.rego`) that policies import:
-
-```rego
-import data.lib.resource_units.canonify_cpu
-import data.lib.resource_units.canonify_mem
-```
-
-With the library extracted, the remaining shape would be simple and templateable:
-
-```rego
-package {{.Package}}
-
-import rego.v1
-import data.lib.resource_units
-
-violation contains {"msg": msg} if {
-    some container in input.review.object.spec.containers
-    value := container.resources.{{.Field}}.{{.ResourceType}}
-    limit := resource_units.canonify_{{.CanonifyFn}}(value)
-    max := resource_units.canonify_{{.CanonifyFn}}(input.parameters.{{.ResourceType}})
-    limit > max
-    msg := sprintf(
-        "Container '%s': %s %s exceeds maximum %s",
-        [container.name, "{{.Field}}", "{{.ResourceType}}", input.parameters.{{.ResourceType}}],
-    )
-}
-```
-
-### Blockers
-
-1. The shape contract says shapes must be **self-contained** — no `data.lib.*` imports.
-   This would require either:
-   - Relaxing the contract to allow a `lib/` directory in the repo
-   - Inlining the library in the template (back to the 80-line problem)
-
-2. The gatekeeper-library versions of these policies also reference
-   `data.lib.exempt_container.is_exempt` and `data.lib.exclude_update.is_update`,
-   which are Gatekeeper-specific library features. A pure shape can't replicate this
-   without introducing a Gatekeeper dependency.
-
-### Recommendation
-
-Use template partials (`_helpers/resource_units.tmpl`) to share the helper logic at
-generation time while keeping generated output self-contained. Tracked in
+Template partials (Option 3) remain tracked as an alternative approach in
 [#1](https://github.com/sonupreetam/rego-shapes/issues/1).
-
-This shape is blocked on that proposal — once `_helpers/` is accepted, the thin
-policy template on top is straightforward to implement.
 
 ---
 
