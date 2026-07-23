@@ -45,13 +45,13 @@ Derived from 49 policies in [gatekeeper-library](https://github.com/open-policy-
 | Shape | Corpus Coverage | Status |
 |-------|:-:|:-:|
 | `container-field-check` | 5 policies | ✅ shipped |
-| `container-field-in-allowlist` | 7 policies | planned |
+| `container-field-in-allowlist` | 7 policies | ✅ shipped |
 | `container-resource-limit-check` | 5 policies | planned |
 | `container-image-allowlist` | 2 policies | ✅ shipped |
-| `container-image-denylist` | 2 policies | planned |
+| `container-image-denylist` | 2 policies | ✅ shipped |
 | `metadata-must-have` | 2 policies | ✅ shipped |
 | `resource-field-equality-block` | 2 policies | ✅ shipped |
-| `resource-numeric-range-check` | 2 policies | planned |
+| `resource-numeric-range-check` | 2 policies | ✅ shipped |
 
 Future categories (RBAC, ABAC, IaC, API authz) require their own corpus analysis
 before shapes can be added. See [SPEC.md](SPEC.md) for scope boundaries.

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "resource-numeric-range-check parameters",
+  "description": "Parameters for generating a Rego policy that validates a numeric field falls within allowed ranges.",
+  "type": "object",
+  "required": ["Package", "FieldPath", "FieldName"],
+  "properties": {
+    "Package": {
+      "type": "string",
+      "description": "Rego package name",
+      "pattern": "^[a-z][a-z0-9_.]*$"
+    },
+    "FieldPath": {
+      "type": "string",
+      "description": "Dot-separated path to the numeric field (e.g., spec.replicas)",
+      "examples": ["spec.replicas", "spec.minReplicas"]
+    },
+    "FieldName": {
+      "type": "string",
+      "description": "Human-readable field name for violation messages",
+      "examples": ["replica count", "minimum replicas"]
+    }
+  },
+  "additionalProperties": false
+}

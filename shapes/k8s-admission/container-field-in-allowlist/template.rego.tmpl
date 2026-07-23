@@ -1,0 +1,40 @@
+package {{.Package}}
+
+import rego.v1
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.containers
+	value := {{.ValueExpr}}
+	not value_allowed(value)
+	msg := sprintf(
+		"Container '%s': %s '%v' is not allowed. Allowed values: %v",
+		[container.name, "{{.FieldName}}", value, allowed_values],
+	)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.initContainers
+	value := {{.ValueExpr}}
+	not value_allowed(value)
+	msg := sprintf(
+		"Init container '%s': %s '%v' is not allowed. Allowed values: %v",
+		[container.name, "{{.FieldName}}", value, allowed_values],
+	)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.ephemeralContainers
+	value := {{.ValueExpr}}
+	not value_allowed(value)
+	msg := sprintf(
+		"Ephemeral container '%s': %s '%v' is not allowed. Allowed values: %v",
+		[container.name, "{{.FieldName}}", value, allowed_values],
+	)
+}
+
+value_allowed(value) if {
+	some allowed in allowed_values
+	value == allowed
+}
+
+allowed_values := input.parameters.{{.ParamKey}}

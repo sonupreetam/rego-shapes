@@ -1,0 +1,36 @@
+package {{.Package}}
+
+import rego.v1
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.containers
+	image := container.image
+	some denied in input.parameters.{{.ParamKey}}
+	{{.MatchExpr}}
+	msg := sprintf(
+		"Container '%s': image '%s' matches denied pattern '%s'",
+		[container.name, image, denied],
+	)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.initContainers
+	image := container.image
+	some denied in input.parameters.{{.ParamKey}}
+	{{.MatchExpr}}
+	msg := sprintf(
+		"Init container '%s': image '%s' matches denied pattern '%s'",
+		[container.name, image, denied],
+	)
+}
+
+violation contains {"msg": msg} if {
+	some container in input.review.object.spec.ephemeralContainers
+	image := container.image
+	some denied in input.parameters.{{.ParamKey}}
+	{{.MatchExpr}}
+	msg := sprintf(
+		"Ephemeral container '%s': image '%s' matches denied pattern '%s'",
+		[container.name, image, denied],
+	)
+}

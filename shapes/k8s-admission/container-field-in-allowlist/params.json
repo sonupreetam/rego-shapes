@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "container-field-in-allowlist parameters",
+  "description": "Parameters for generating a Rego policy that checks a container field value against a parameter-supplied allowlist.",
+  "type": "object",
+  "required": ["Package", "ValueExpr", "FieldName", "ParamKey"],
+  "properties": {
+    "Package": {
+      "type": "string",
+      "description": "Rego package name",
+      "pattern": "^[a-z][a-z0-9_.]*$"
+    },
+    "ValueExpr": {
+      "type": "string",
+      "description": "Rego expression that extracts the value from 'container' (e.g., container.securityContext.procMount)",
+      "examples": [
+        "container.securityContext.procMount",
+        "container.securityContext.seLinuxOptions.type",
+        "container.securityContext.seccompProfile.type"
+      ]
+    },
+    "FieldName": {
+      "type": "string",
+      "description": "Human-readable field name for violation messages",
+      "examples": ["procMount", "seccompProfile type", "SELinux type"]
+    },
+    "ParamKey": {
+      "type": "string",
+      "description": "Key in input.parameters that holds the allowed values list",
+      "examples": ["allowedProcMountTypes", "allowedProfiles", "allowedSELinuxTypes"]
+    }
+  },
+  "additionalProperties": false
+}

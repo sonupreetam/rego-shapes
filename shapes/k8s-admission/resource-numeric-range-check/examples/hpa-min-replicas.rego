@@ -1,0 +1,18 @@
+package k8s.hpa_min_replicas
+
+import rego.v1
+
+violation contains {"msg": msg} if {
+	value := input.review.object.spec.minReplicas
+	not value_in_range(value)
+	msg := sprintf(
+		"%s '%s': minimum replicas %d is outside allowed ranges %v",
+		[input.review.kind.kind, input.review.object.metadata.name, value, input.parameters.ranges],
+	)
+}
+
+value_in_range(value) if {
+	some range in input.parameters.ranges
+	range.min <= value
+	range.max >= value
+}

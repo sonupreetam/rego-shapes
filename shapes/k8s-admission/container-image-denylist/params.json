@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "container-image-denylist parameters",
+  "description": "Parameters for generating a Rego policy that blocks container images matching denied patterns.",
+  "type": "object",
+  "required": ["Package", "ParamKey", "MatchExpr"],
+  "properties": {
+    "Package": {
+      "type": "string",
+      "description": "Rego package name",
+      "pattern": "^[a-z][a-z0-9_.]*$"
+    },
+    "ParamKey": {
+      "type": "string",
+      "description": "Key in input.parameters holding the denied patterns list",
+      "examples": ["repos", "tags"]
+    },
+    "MatchExpr": {
+      "type": "string",
+      "description": "Rego match expression using 'image' and 'denied' variables",
+      "examples": [
+        "startswith(image, denied)",
+        "endswith(image, denied)",
+        "contains(image, denied)"
+      ]
+    }
+  },
+  "additionalProperties": false
+}
