@@ -45,7 +45,9 @@ Provide a catalog of parameterized Rego policy shapes — structural templates w
 5. **Runtime policy evaluation** — shapes are for generation-time, not evaluation-time.
 6. **Policy-as-a-service** — no API, no server, no deployment infrastructure.
 7. **Non-Kubernetes domains** (initially) — RBAC, ABAC, API authz, IaC gates are
-   future categories. The initial focus is Kubernetes admission control.
+   future categories. The initial focus is Kubernetes admission control. New categories
+   require corpus analysis first: ≥3 distinct shapes covering ≥10 policies from public
+   sources. See [corpus/README.md](corpus/README.md) for candidate sources.
 8. **Compliance framework mapping** — shapes are structural, not tied to CIS/NIST/SOC2.
    Compliance mapping is the consumer's responsibility.
 
