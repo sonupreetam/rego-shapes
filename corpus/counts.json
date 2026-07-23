@@ -1,0 +1,8 @@
+{
+  "aws-infra-policy-as-code": 92,
+  "conftest": 43,
+  "gatekeeper-library": 91,
+  "instrumenta-policies": 2,
+  "raspbernetes": 63,
+  "redhat-cop-rego": 60
+}

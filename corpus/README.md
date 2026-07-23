@@ -67,10 +67,26 @@ Not yet analyzed — listed here so contributors know where to look.
 | [StyraInc/opa-kafka-plugin](https://github.com/StyraInc/opa-kafka-plugin) | ~5 | Kafka topic authz, message filtering |
 | OPA partial evaluation docs | ~5 | Row-level filtering patterns |
 
+## Corpus Refresh
+
+Run `scripts/corpus-refresh.sh` periodically to check if analyzed sources have
+added new policies since our last analysis:
+
+```bash
+./scripts/corpus-refresh.sh          # check for changes
+./scripts/corpus-refresh.sh --update  # update baseline after re-analysis
+```
+
+Baseline counts are stored in `corpus/counts.json`. When the script reports new
+policies, re-analyze the changed source and update the relevant taxonomy doc.
+
 ## How to Analyze a New Source
 
 1. Clone the repo, find all `.rego` files (exclude tests)
 2. For each policy, answer the 5 structural questions from [analysis/README.md](../analysis/README.md)
 3. Cluster by structure, not by domain
 4. If ≥3 shapes covering ≥10 policies → add the category
-5. Document results in `analysis/taxonomy.md` and update this file
+5. Document results in `analysis/<category>-taxonomy.md` with per-policy appendix
+6. Update this file (move source from "Candidate" to "Analyzed")
+7. Update [STATUS.md](../STATUS.md) and [README.md](../README.md)
+8. Run `./scripts/corpus-refresh.sh --update` to set the new baseline

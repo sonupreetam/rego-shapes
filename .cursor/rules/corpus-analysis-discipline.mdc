@@ -1,0 +1,49 @@
+---
+description: Enforce documentation discipline for corpus analysis and design decisions
+globs: analysis/**
+alwaysApply: false
+---
+
+# Corpus Analysis Discipline
+
+When performing corpus analysis or making design decisions in the rego-shapes repo,
+**never leave results only in chat or agent transcripts**. All analysis must be
+persisted in the repo before the session ends.
+
+## After Any Corpus Analysis
+
+1. **Per-policy classification** — Add an appendix to the relevant taxonomy doc
+   (`analysis/*-taxonomy.md`) with the full per-policy table showing which shape
+   each policy maps to.
+
+2. **Update corpus/README.md** — Move the source from "Candidate Sources" to
+   "Analyzed Sources" with the final policy count and shape count.
+
+3. **Update STATUS.md** — Reflect new shapes, updated counts, and any new blockers.
+
+4. **If shapes are deferred** — Document in `analysis/deferred.md` with the reason
+   and what approach would unblock them.
+
+5. **If design questions arise** — Add to `analysis/open-questions.md` with options,
+   trade-offs, and what the question blocks.
+
+## After Any Design Decision
+
+1. Record the decision in `analysis/deferred.md` under "Design Decisions Made"
+   with date, context, rationale, and alternatives considered.
+
+2. If the decision resolves an open question, update `analysis/open-questions.md`
+   to mark it resolved with the decision and date.
+
+3. Update `STATUS.md` if the decision changes what's planned, blocked, or deferred.
+
+## After Implementing a Shape
+
+1. Update `STATUS.md` — move from "Planned" to "Shipped".
+2. Update `README.md` — change status from "planned" to "✅ shipped".
+3. If it was previously deferred, update `analysis/deferred.md`.
+
+## Commit Discipline
+
+Corpus analysis, taxonomy docs, and status updates should be committed in the
+**same session** as the analysis — not deferred to a later session.
