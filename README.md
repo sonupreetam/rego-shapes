@@ -39,21 +39,39 @@ classification and methodology.
 
 ### Kubernetes Admission (`shapes/k8s-admission/`)
 
-Derived from 49 policies in [gatekeeper-library](https://github.com/open-policy-agent/gatekeeper-library).
-20 structural shapes identified; top 6 cover 43% of all policies.
+Derived from 49 policies in [gatekeeper-library](https://github.com/open-policy-agent/gatekeeper-library)
+plus 134 policies from [raspbernetes](https://github.com/raspbernetes/k8s-security-policies),
+[instrumenta](https://github.com/instrumenta/policies), and
+[redhat-cop](https://github.com/redhat-cop/rego-policies).
 
 | Shape | Corpus Coverage | Status |
 |-------|:-:|:-:|
-| `container-field-check` | 5 policies | ✅ shipped |
+| `container-field-check` | 15 policies | ✅ shipped |
 | `container-field-in-allowlist` | 7 policies | ✅ shipped |
-| `container-resource-limit-check` | 5 policies | planned |
+| `container-resource-limit-check` | 5 policies | [deferred](analysis/deferred.md) |
 | `container-image-allowlist` | 2 policies | ✅ shipped |
 | `container-image-denylist` | 2 policies | ✅ shipped |
 | `metadata-must-have` | 2 policies | ✅ shipped |
 | `resource-field-equality-block` | 2 policies | ✅ shipped |
 | `resource-numeric-range-check` | 2 policies | ✅ shipped |
+| `component-flag-check` | 36 policies | planned |
+| `pod-field-check` | 7 policies | planned |
 
-Future categories (RBAC, ABAC, IaC, API authz) require their own corpus analysis
+### Terraform Plan (`shapes/terraform-plan/`)
+
+Derived from 90 policies in [aws-samples/aws-infra-policy-as-code-with-terraform](https://github.com/aws-samples/aws-infra-policy-as-code-with-terraform).
+5 structural shapes identified; all 5 cover ≥10 policies each.
+See [analysis/terraform-plan-taxonomy.md](analysis/terraform-plan-taxonomy.md).
+
+| Shape | Corpus Coverage | Status |
+|-------|:-:|:-:|
+| `tf-resource-field-check` | ~45 policies | planned |
+| `tf-config-reference-check` | ~18 policies | planned |
+| `tf-field-in-set` | ~12 policies | planned |
+| `tf-inline-flat-deny` | ~10 policies | planned |
+| `tf-cross-resource-check` | ~10 policies | [deferred](analysis/deferred.md) |
+
+Future categories (RBAC, API authz, CI/CD) require their own corpus analysis
 before shapes can be added. See [SPEC.md](SPEC.md) for scope boundaries.
 
 ## Usage
@@ -87,10 +105,14 @@ requirements that don't fit a shape, and validate AI output with OPA's toolchain
 The `analysis/` directory contains the structural analysis that informed the shape
 taxonomy:
 
-- **49 policies** from [gatekeeper-library](https://github.com/open-policy-agent/gatekeeper-library)
-  (30 general + 19 pod-security-policy) classified by structural shape
-- **20 shapes** identified, with coverage metrics per shape
-- Full per-policy classification in [analysis/taxonomy.md](analysis/taxonomy.md)
+- [analysis/taxonomy.md](analysis/taxonomy.md) — **49 policies** from gatekeeper-library,
+  20 shapes identified (k8s-admission)
+- [analysis/terraform-plan-taxonomy.md](analysis/terraform-plan-taxonomy.md) — **90 policies**
+  from aws-samples, 5 shapes identified (terraform-plan)
+- [analysis/k8s-manifest-taxonomy.md](analysis/k8s-manifest-taxonomy.md) — **134 policies**
+  from raspbernetes, conftest, instrumenta, redhat-cop (k8s-manifest/conftest)
+- [analysis/deferred.md](analysis/deferred.md) — shapes that can't be cleanly
+  templated under the current contract
 
 See [analysis/README.md](analysis/README.md) for methodology.
 

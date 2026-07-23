@@ -11,6 +11,11 @@ See [SPEC.md](../SPEC.md) for the gate: ≥3 distinct shapes covering ≥10 poli
 | Source | Category | Policies Analyzed | Shapes Found | Status |
 |--------|----------|:-:|:-:|:---:|
 | [open-policy-agent/gatekeeper-library](https://github.com/open-policy-agent/gatekeeper-library) | k8s-admission | 49 | 20 | ✅ complete |
+| [aws-samples/aws-infra-policy-as-code-with-terraform](https://github.com/aws-samples/aws-infra-policy-as-code-with-terraform) | terraform-plan | 90 | 5 | ✅ complete |
+| [raspbernetes/k8s-security-policies](https://github.com/raspbernetes/k8s-security-policies) | k8s-manifest | 62 | 6 | ✅ complete |
+| [open-policy-agent/conftest — kubernetes examples](https://github.com/open-policy-agent/conftest/tree/master/examples/kubernetes) | k8s-manifest | 12 | 2 | ✅ complete |
+| [instrumenta/policies](https://github.com/instrumenta/policies) | k8s-manifest | ~30 | 1 | ✅ complete |
+| [redhat-cop/rego-policies](https://github.com/redhat-cop/rego-policies) | k8s-manifest | ~30 | 1 | ✅ complete |
 
 ## Candidate Sources for Future Analysis
 
@@ -21,10 +26,9 @@ Not yet analyzed — listed here so contributors know where to look.
 
 | Source | Est. Policies | Notes |
 |--------|:---:|-------|
-| [open-policy-agent/conftest — examples](https://github.com/open-policy-agent/conftest/tree/master/examples) | ~20 | Terraform, Dockerfile, K8s YAML, multi-format |
+| [open-policy-agent/conftest — examples (non-K8s)](https://github.com/open-policy-agent/conftest/tree/master/examples) | ~15 | Terraform HCL, Dockerfile, serverless — non-K8s examples |
 | [fugue/regula](https://github.com/fugue/regula/tree/master/rego/rules) | ~40 | AWS/Azure/GCP rules for Terraform + CloudFormation |
 | [spacelift-io/spacelift-policies-example-library](https://github.com/spacelift-io/spacelift-policies-example-library) | ~15 | Terraform plan/apply gates |
-| [aws-samples/aws-infra-policy-as-code-with-terraform](https://github.com/aws-samples/aws-infra-policy-as-code-with-terraform) | ~30 | AWS-specific OPA rules for Terraform plans, per-service (S3, EFS, IAM, etc.) |
 | [cmcconnell1/policy-as-code](https://github.com/cmcconnell1/policy-as-code) | ~25 | Multi-cloud (AWS + Azure) security, tagging, cost governance framework |
 
 ### RBAC / ABAC (Authorization)
@@ -45,15 +49,8 @@ Not yet analyzed — listed here so contributors know where to look.
 
 ### Kubernetes Config (Conftest — pre-deploy YAML validation)
 
-Distinct from k8s-admission: these policies validate static YAML manifests in CI,
-not admission requests at the API server. Different `input` shape (raw manifest vs
-admission review envelope).
-
 | Source | Est. Policies | Notes |
 |--------|:---:|-------|
-| [instrumenta/policies](https://github.com/instrumenta/policies) | ~15 | Shared Conftest policies for K8s deployments (limits, capabilities, read-only fs) |
-| [redhat-cop/rego-policies](https://github.com/redhat-cop/rego-policies) | ~30 | Red Hat CoP policies for Conftest + Gatekeeper dual-use |
-| [raspbernetes/k8s-security-policies](https://github.com/raspbernetes/k8s-security-policies) | ~20 | CIS Kubernetes Benchmark mapped to Rego; Conftest + Gatekeeper compatible |
 | [rallyhealth/conftest-policy-packs](https://github.com/rallyhealth/conftest-policy-packs) | ~20 | Enterprise Compliance-as-Code policies with markdown violation messages |
 
 ### CI/CD Pipeline
